@@ -114,7 +114,7 @@
                 }
             }
 
-            // If no winning move, choose a random empty cell
+         
             if (botMove === -1) {
                 const randomIndex = Math.floor(Math.random() * emptyCells.length);
                 botMove = emptyCells[randomIndex];
@@ -136,15 +136,15 @@
 
         function checkWinner(boardState = board, player = currentPlayer) {
             const winPatterns = [
-                [0, 1, 2], [3, 4, 5], [6, 7, 8], // Rows
-                [0, 3, 6], [1, 4, 7], [2, 5, 8], // Columns
-                [0, 4, 8], [2, 4, 6]             // Diagonals
+                [0, 1, 2], [3, 4, 5], [6, 7, 8], 
+                [0, 3, 6], [1, 4, 7], [2, 5, 8], 
+                [0, 4, 8], [2, 4, 6]             
             ];
 
             for (const pattern of winPatterns) {
                 const [a, b, c] = pattern;
                 if (boardState[a] === player && boardState[b] === player && boardState[c] === player) {
-                    return pattern; // Return the winning combination
+                    return pattern; 
                 }
             }
 
@@ -164,7 +164,7 @@
         }
 
         function restartGame() {
-            location.reload(); // Refresh the page
+            location.reload(); 
         }
     </script>
 </body>
