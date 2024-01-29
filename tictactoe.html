@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tic Tac Toe</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            margin: 50px;
+            color: rgb(255, 255, 255);
+            background-color: rgb(0, 0, 0);
+            background-image: url(starry-night-sky-dark-aesthetic-ro6a8cda8gg0zoil.jpg);
+            background-size: cover;
+        }
+        .board {
+            display: grid;
+            grid-template-columns: repeat(3, 100px);
+            gap: 5px;
+        }
+
+        .cell {
+            width: 100px;
+            height: 100px;
+            border: 2px solid #fcfcfc;
+            font-size: 5em;
+            cursor: pointer;
+        }
+
+        #message {
+            margin-bottom: 10px;
+        }
+
+        #restartButton {
+            padding: 10px;
+            font-size: 1em;
+            background-color: #eef0ee;
+            color: rgb(0, 0, 0);
+            border: snow;
+            cursor: pointer;
+        }
+
+        .winning-cell {
+            background-color: #4b634c;
+        }
+    </style>
+</head>
+<body>
+    <h1>Tic Tac Toe</h1>
+    <div id="message">Player X's turn</div>
+    <div class="board" onclick="handleCellClick(event)">
+        <div class="cell" data-index="0"></div>
+        <div class="cell" data-index="1"></div>
+        <div class="cell" data-index="2"></div>
+        <div class="cell" data-index="3"></div>
+        <div class="cell" data-index="4"></div>
+        <div class="cell" data-index="5"></div>
+        <div class="cell" data-index="6"></div>
+        <div class="cell" data-index="7"></div>
+        <div class="cell" data-index="8"></div>
+    </div>
+
+    <button id="restartButton" onclick="restartGame()"><b>New Game</b></button>
+
+    <script>
+        let currentPlayer = 'X';
+        let board = Array(9).fill('');
+
+        function handleCellClick(event) {
+            const cellIndex = event.target.dataset.index;
+
+            if (board[cellIndex] === '' && !isGameFinished()) {
+                board[cellIndex] = currentPlayer;
+                event.target.textContent = currentPlayer;
+
+                if (checkWinner()) {
+                    document.getElementById('message').textContent = `Player ${currentPlayer} wins!`;
+                    highlightWinningCells(checkWinner());
+                } else if (board.every(cell => cell !== '')) {
+                    document.getElementById('message').textContent = 'It\'s a draw!';
+                } else {
+                    currentPlayer = currentPlayer === 'X' ? 'O' : 'X';
+                    document.getElementById('message').textContent = `Player ${currentPlayer}'s turn`;
+                    if (currentPlayer === 'O') {
+                        // Bot's turn
+                        setTimeout(() => makeBotMove(), 500); 
+                    }
+                }
+            }
+        }
+
+        function makeBotMove() {
+            const emptyCells = board.reduce((acc, cell, index) => {
+                if (cell === '') acc.push(index);
+                return acc;
+            }, []);
+
+            if (emptyCells.length === 0 || isGameFinished()) {
+                return;
+            }
+
+            let botMove = -1;
+
+            // Check for a winning move
+            for (let i = 0; i < emptyCells.length; i++) {
+                const testMove = emptyCells[i];
+                const tempBoard = [...board];
+                tempBoard[testMove] = currentPlayer;
+
+                if (checkWinner(tempBoard, currentPlayer)) {
+                    botMove = testMove;
+                    break;
+                }
+            }
+
+            // If no winning move, choose a random empty cell
+            if (botMove === -1) {
+                const randomIndex = Math.floor(Math.random() * emptyCells.length);
+                botMove = emptyCells[randomIndex];
+            }
+
+            board[botMove] = currentPlayer;
+            document.querySelector(`.cell[data-index="${botMove}"]`).textContent = currentPlayer;
+
+            if (checkWinner()) {
+                document.getElementById('message').textContent = 'Player O (Bot) wins!';
+                highlightWinningCells(checkWinner());
+            } else if (board.every(cell => cell !== '')) {
+                document.getElementById('message').textContent = 'It\'s a draw!';
+            } else {
+                currentPlayer = currentPlayer === 'X' ? 'O' : 'X';
+                document.getElementById('message').textContent = `Player ${currentPlayer}'s turn`;
+            }
+        }
+
+        function checkWinner(boardState = board, player = currentPlayer) {
+            const winPatterns = [
+                [0, 1, 2], [3, 4, 5], [6, 7, 8], // Rows
+                [0, 3, 6], [1, 4, 7], [2, 5, 8], // Columns
+                [0, 4, 8], [2, 4, 6]             // Diagonals
+            ];
+
+            for (const pattern of winPatterns) {
+                const [a, b, c] = pattern;
+                if (boardState[a] === player && boardState[b] === player && boardState[c] === player) {
+                    return pattern; // Return the winning combination
+                }
+            }
+
+            return null;
+        }
+
+        function isGameFinished() {
+            return checkWinner() || board.every(cell => cell !== '');
+        }
+
+        function highlightWinningCells(winningCells) {
+            if (winningCells) {
+                for (const index of winningCells) {
+                    document.querySelector(`.cell[data-index="${index}"]`).classList.add('winning-cell');
+                }
+            }
+        }
+
+        function restartGame() {
+            location.reload(); // Refresh the page
+        }
+    </script>
+</body>
+</html>
